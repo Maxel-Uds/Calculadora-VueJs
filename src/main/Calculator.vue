@@ -1,7 +1,7 @@
 <!-- eslint-disable vue/multi-word-component-names -->
 <template>
   <div class="calculator">
-    <Display />
+    <Display value="100"/>
     <Button label="AC" triple/>
     <Button label="/" operation/>
     <Button label="7"/>
