@@ -1,7 +1,7 @@
 <!-- eslint-disable vue/multi-word-component-names -->
 <template>
   <div class="calculator">
-    <Display value="100"/>
+    <Display :value="displayValue"/>
     <Button label="AC" triple @onClick="clearMemory"/>
     <Button label="/" operation @onClick="setOperation"/>
     <Button label="7" @onClick="addDigit"/>
@@ -27,16 +27,53 @@ import Display from "../components/Display.vue";
 import Button from "../components/Button.vue";
 
 export default {
+    data: function() {
+        return {
+            displayValue: "0",
+            clearDisplay: false,
+            operation: null,
+            values: [0, 0],
+            current: 0
+        }
+    },
     components: { Button, Display },
     methods: {
         clearMemory() {
-
+            Object.assign(this.$data, this.$options.data())
         },
         setOperation(operation) {
+            if(this.current === 0) {
+                this.operation = operation;
+                this.current = 1;
+                this.clearDisplay = true;
+            } else {
+                const equals = operation === '=';
+                const currentOperation = this.operation;
 
+                try {
+                    this.values[0] = eval(`${this.values[0]} ${currentOperation} ${this.values[1]}`);
+                } catch(e) {
+                    this.$emit('onError', e);
+                }
+
+                this.values[1] = 0;
+
+                this.displayValue = this.values[0];
+                this.operation = equals ? null : operation;
+                this.current = equals ? 0 : 1;
+                this.clearDisplay = !equals;
+            }
         },
         addDigit(n) {
+            if(n === '.' && this.displayValue.includes('.')) {
+                return null;
+            }
 
+            const clearDisplay = this.displayValue === '0' || this.clearDisplay;
+            const currentValue = clearDisplay ? '' : this.displayValue;
+            this.displayValue = currentValue + n;
+            this.clearDisplay = false;
+            this.values[this.current] = this.displayValue;
         }
     }
 }

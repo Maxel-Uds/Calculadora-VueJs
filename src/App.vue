@@ -1,6 +1,6 @@
 <template>
   <div id="app">
-    <Calculator />
+    <Calculator @onError="showError"/>
   </div>
 </template>
 
@@ -8,7 +8,12 @@
 import Calculator from "./main/Calculator.vue"
 
 export default {
-    components: { Calculator }
+    components: { Calculator },
+    methods: {
+        showError(error) {
+            alert(`An error ocurred: ${error}`)
+        }
+    }
 }
 </script>
 
